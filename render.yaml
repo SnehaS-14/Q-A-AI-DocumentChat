@@ -21,19 +21,3 @@ services:
         sync: false
       - key: CLIENT_URL
         sync: false          # set to your frontend Render URL after deploy
-
-  # ── Frontend Static Site ──────────────────────────────────────
-  - type: static
-    name: document-chatbot-ui
-    rootDir: client
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        sync: false          # set to your backend Render URL after deploy
-      - key: VITE_GOOGLE_CLIENT_ID
-        sync: false
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
