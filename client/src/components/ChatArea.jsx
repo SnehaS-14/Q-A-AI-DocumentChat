@@ -43,7 +43,7 @@ export default function ChatArea({ selectedDocuments = [], history, isSending, e
   const canSend = hasDocuments && !isSending && inputValue.trim().length > 0;
 
   return (
-    <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <main className="flex-1 flex flex-col min-w-0 overflow-hidden h-full">
       <header className="flex items-center justify-between px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex-shrink-0 gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="min-w-0">

@@ -299,7 +299,7 @@ export default function ChatApp() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
           {/* Mobile Header */}
           <div className="md:hidden bg-white border-b-2 border-gray-300 px-3 py-3 flex items-center justify-between gap-3 sticky top-0 z-20">
             <button

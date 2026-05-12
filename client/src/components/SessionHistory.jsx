@@ -11,7 +11,7 @@ function formatBytes(bytes) {
 
 export default function SessionHistory({ sessions, onSelectSession, onDeleteSession, onClose }) {
   return (
-    <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+    <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-full">
       <header className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white flex-shrink-0">
         <h1 className="font-semibold text-gray-800">Chat History</h1>
         <button
