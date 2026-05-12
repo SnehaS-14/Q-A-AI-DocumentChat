@@ -23,10 +23,10 @@ function InputField({ label, type, value, onChange, placeholder, disabled, icon 
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">{label}</label>
       <div className="relative">
         {icon && (
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 flex-shrink-0">{icon}</span>
         )}
         <input
           type={inputType}
@@ -66,11 +66,12 @@ export default function LoginPage({ onLoginSuccess }) {
   const { toasts, toast, removeToast } = useToast();
 
   function validate() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (isSignup) {
       if (!username.trim()) { toast.error('Username is required', 'Validation'); return false; }
       if (username.trim().length < 3) { toast.error('Username must be at least 3 characters', 'Validation'); return false; }
       if (!email.trim()) { toast.error('Email is required', 'Validation'); return false; }
-      if (!/\S+@\S+\.\S+/.test(email)) { toast.error('Enter a valid email address', 'Validation'); return false; }
+      if (!emailRegex.test(email.trim())) { toast.error('Enter a valid email address', 'Validation'); return false; }
       if (!password) { toast.error('Password is required', 'Validation'); return false; }
       if (password.length < 6) { toast.error('Password must be at least 6 characters', 'Validation'); return false; }
     } else {
@@ -124,10 +125,10 @@ export default function LoginPage({ onLoginSuccess }) {
     <>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-      <div className="min-h-screen flex bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900">
+      <div className="min-h-screen flex bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 flex-col lg:flex-row">
 
         {/* Left panel — branding (hidden on mobile) */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-12 text-white relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-8 lg:p-12 text-white relative overflow-hidden">
           {/* decorative circles */}
           <div className="absolute top-[-80px] left-[-80px] w-72 h-72 bg-blue-500 rounded-full opacity-10" />
           <div className="absolute bottom-[-60px] right-[-60px] w-56 h-56 bg-indigo-400 rounded-full opacity-10" />
@@ -158,23 +159,23 @@ export default function LoginPage({ onLoginSuccess }) {
         </div>
 
         {/* Right panel — form */}
-        <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12">
           <div className="w-full max-w-md">
 
             {/* Mobile logo */}
-            <div className="text-center mb-8 lg:hidden">
-              <div className="text-5xl mb-2">📚</div>
-              <h1 className="text-2xl font-bold text-white">Document Q&A</h1>
-              <p className="text-blue-200 text-sm mt-1">Chat with your documents</p>
+            <div className="text-center mb-6 sm:mb-8 lg:hidden">
+              <div className="text-4xl sm:text-5xl mb-2">📚</div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">Document Q&A</h1>
+              <p className="text-blue-200 text-xs sm:text-sm mt-1">Chat with your documents</p>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-2xl p-8">
+            <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
               {/* Heading */}
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                   {isSignup ? 'Create account' : 'Welcome back'}
                 </h2>
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-gray-500 text-xs sm:text-sm mt-1">
                   {isSignup ? 'Start chatting with your documents' : 'Sign in to continue'}
                 </p>
               </div>
@@ -200,16 +201,17 @@ export default function LoginPage({ onLoginSuccess }) {
               </div>
 
               {/* Google */}
-              <div className="flex justify-center mb-5">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => toast.error('Google sign-in failed. Please try again.', 'Error')}
-                  text={isSignup ? 'signup_with' : 'signin_with'}
-                  shape="rectangular"
-                  theme="outline"
-                  size="large"
-                  width="368"
-                />
+              <div className="flex justify-center mb-5 w-full">
+                <div className="w-full">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => toast.error('Google sign-in failed. Please try again.', 'Error')}
+                    text={isSignup ? 'signup_with' : 'signin_with'}
+                    shape="rectangular"
+                    theme="outline"
+                    size="large"
+                  />
+                </div>
               </div>
 
               {/* Divider */}

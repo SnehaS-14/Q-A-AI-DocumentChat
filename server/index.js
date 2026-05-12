@@ -44,6 +44,22 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+// --- OpenRouter Configuration ---
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+
+// Available models with their IDs
+const AVAILABLE_MODELS = {
+  'groq-llama-3.1-8b': { name: 'Groq: Llama 3.1 8B', provider: 'groq', id: 'llama-3.1-8b-instant' },
+  'groq-llama-3.1-70b': { name: 'Groq: Llama 3.1 70B', provider: 'groq', id: 'llama-3.1-70b-versatile' },
+  'openrouter-claude-3.5-sonnet': { name: 'OpenRouter: Claude 3.5 Sonnet', provider: 'openrouter', id: 'anthropic/claude-3.5-sonnet' },
+  'openrouter-gpt-4-turbo': { name: 'OpenRouter: GPT-4 Turbo', provider: 'openrouter', id: 'openai/gpt-4-turbo' },
+  'openrouter-llama-3.1-405b': { name: 'OpenRouter: Llama 3.1 405B', provider: 'openrouter', id: 'meta-llama/llama-3.1-405b-instruct' },
+};
+
+// Default model
+const DEFAULT_MODEL = 'groq-llama-3.1-8b';
+
 // --- Google OAuth Client ---
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -54,10 +70,10 @@ const allowedOrigins = process.env.CLIENT_URL
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
-// --- Multer: in-memory storage, 10MB limit, PDF/DOCX/DOC only ---
+// --- Multer: in-memory storage, 100MB limit, PDF/DOCX/DOC only ---
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
   fileFilter: (req, file, cb) => {
     const allowed = [
       'application/pdf',
@@ -72,6 +88,26 @@ const upload = multer({
     }
   },
 });
+
+// --- Helper: Optimize text for token limits ---
+function optimizeDocumentText(text, maxChars = 20000) {
+  if (text.length <= maxChars) {
+    return text;
+  }
+
+  // Try to truncate at sentence boundary
+  let truncated = text.substring(0, maxChars);
+  const lastSentence = Math.max(
+    truncated.lastIndexOf('.'),
+    truncated.lastIndexOf('!'),
+    truncated.lastIndexOf('?')
+  );
+
+  if (lastSentence > maxChars * 0.8) {
+    return truncated.substring(0, lastSentence + 1);
+  }
+  return truncated + '...';
+}
 
 // --- System Prompt ---
 const SYSTEM_PROMPT = `You are a document assistant. Your job is to read uploaded documents (PDF or Word) and answer the user's questions based on the content of those documents.
@@ -305,6 +341,17 @@ app.get('/api/search', authenticateToken, async (req, res) => {
   }
 });
 
+// --- GET /api/models ---
+app.get('/api/models', (req, res) => {
+  const models = Object.entries(AVAILABLE_MODELS).map(([key, model]) => ({
+    id: key,
+    name: model.name,
+    provider: model.provider,
+    available: model.provider === 'groq' || !!OPENROUTER_API_KEY,
+  }));
+  res.json({ models, default: DEFAULT_MODEL });
+});
+
 // --- GET /api/health ---
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -371,10 +418,20 @@ app.post('/api/upload', authenticateToken, upload.single('file'), async (req, re
 // --- POST /api/chat ---
 app.post('/api/chat', authenticateToken, async (req, res) => {
   try {
-    const { message, documentTexts = [], documentText, history = [], sessionId, documentId } = req.body;
+    const { message, documentTexts = [], documentText, history = [], sessionId, documentId, model = DEFAULT_MODEL } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'message is required' });
+    }
+
+    // Validate and get model configuration
+    const modelConfig = AVAILABLE_MODELS[model];
+    if (!modelConfig) {
+      return res.status(400).json({ error: 'Invalid model selected' });
+    }
+
+    if (modelConfig.provider === 'openrouter' && !OPENROUTER_API_KEY) {
+      return res.status(400).json({ error: 'OpenRouter API key not configured' });
     }
 
     const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
@@ -387,7 +444,9 @@ app.post('/api/chat', authenticateToken, async (req, res) => {
     if (activeDocs.length > 0) {
       let docContent = '';
       activeDocs.forEach((doc, idx) => {
-        docContent += `<document name="${doc.filename || `Document ${idx + 1}`}">\n${doc.text}\n</document>\n\n`;
+        // Optimize each document to prevent token limit issues
+        const optimizedText = optimizeDocumentText(doc.text, 18000);
+        docContent += `<document name="${doc.filename || `Document ${idx + 1}`}">\n${optimizedText}\n</document>\n\n`;
       });
       messages.push({
         role: 'user',
@@ -405,14 +464,43 @@ app.post('/api/chat', authenticateToken, async (req, res) => {
     }
     messages.push({ role: 'user', content: message });
 
-    // Call Groq API
-    const response = await groq.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      max_tokens: 1024,
-      messages,
-    });
+    // Call appropriate API based on model provider
+    let reply;
 
-    const reply = response.choices[0].message.content;
+    if (modelConfig.provider === 'groq') {
+      const response = await groq.chat.completions.create({
+        model: modelConfig.id,
+        max_tokens: 1024,
+        messages,
+      });
+      reply = response.choices[0].message.content;
+    } else if (modelConfig.provider === 'openrouter') {
+      const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': process.env.CLIENT_URL || 'http://localhost:5173',
+          'X-Title': 'Document Q&A',
+        },
+        body: JSON.stringify({
+          model: modelConfig.id,
+          messages,
+          max_tokens: 1024,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenRouter API error: ${error.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      reply = data.choices[0].message.content;
+    } else {
+      throw new Error('Unknown model provider');
+    }
 
     // Save messages to MongoDB
     if (sessionId && documentId) {
@@ -474,7 +562,13 @@ app.get('/api/document/file/:sessionId', authenticateToken, async (req, res) => 
     if (!fs.existsSync(doc.filePath)) {
       return res.status(404).json({ error: 'File not found on disk' });
     }
-    res.download(doc.filePath, doc.filename);
+    const download = req.query.download === 'true';
+    if (download) {
+      res.download(doc.filePath, doc.filename);
+    } else {
+      res.setHeader('Content-Disposition', `inline; filename="${doc.filename}"`);
+      res.sendFile(doc.filePath);
+    }
   } catch (err) {
     console.error('Download file error:', err);
     res.status(500).json({ error: err.message });
@@ -517,7 +611,7 @@ app.get('/api/all-sessions', authenticateToken, async (req, res) => {
 // --- GET /api/user-documents ---
 app.get('/api/user-documents', authenticateToken, async (req, res) => {
   try {
-    const documents = await Document.find({ userId: req.user.id }, { filename: 1, charCount: 1, text: 1, _id: 1, uploadedAt: 1 }).sort({ uploadedAt: -1 });
+    const documents = await Document.find({ userId: req.user.id }, { filename: 1, charCount: 1, text: 1, _id: 1, uploadedAt: 1, sessionId: 1 }).sort({ uploadedAt: -1 });
     res.json({ documents });
   } catch (err) {
     console.error('Get user documents error:', err);
@@ -538,10 +632,22 @@ app.delete('/api/session/:sessionId', authenticateToken, async (req, res) => {
   }
 });
 
+// --- Serve static frontend files in production ---
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDistPath = path.join(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    }
+  });
+}
+
 // --- Error handler for multer ---
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(413).json({ success: false, error: 'File too large. Max 10MB allowed.' });
+    return res.status(413).json({ success: false, error: 'File too large. Max 100MB allowed.' });
   }
   res.status(400).json({ success: false, error: err.message });
 });

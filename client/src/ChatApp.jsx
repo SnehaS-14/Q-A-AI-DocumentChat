@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
 import SessionHistory from './components/SessionHistory';
+import ViewerModal from './components/ViewerModal';
 import { ToastContainer, useToast } from './components/Toast';
 import {
   uploadDocument, sendMessage, getChatHistory, getAllSessions, deleteSession,
-  logout, getCurrentUser, getUserDocuments, searchDocuments, getDocumentBySessionId,
+  logout, getCurrentUser, getUserDocuments, searchDocuments, getDocumentBySessionId, downloadDocument,
+  getSelectedModel, getAuthHeader,
 } from './api';
 
 function normalizeDoc(doc) {
-  return { ...doc, id: doc._id };
+  return { ...doc, id: doc._id, sessionId: doc.sessionId };
 }
 
 export default function ChatApp() {
@@ -24,6 +26,9 @@ export default function ChatApp() {
   const [user, setUser] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(getSelectedModel());
+  const [viewerModal, setViewerModal] = useState({ show: false, blobUrl: null, filename: '' });
   const { toasts, toast, removeToast } = useToast();
 
   useEffect(() => {
@@ -93,6 +98,7 @@ export default function ChatApp() {
         type: file.type,
         id: result.documentId,
         _id: result.documentId,
+        sessionId: result.sessionId,
       };
       setDocument(newDoc);
       setSelectedDocuments([newDoc]);
@@ -187,7 +193,7 @@ export default function ChatApp() {
 
     try {
       const documentTexts = selectedDocuments.map(d => ({ filename: d.filename, text: d.text }));
-      const { reply } = await sendMessage(message, '', history, sessionId, selectedDocuments[0]?.id, documentTexts);
+      const { reply } = await sendMessage(message, '', history, sessionId, selectedDocuments[0]?.id, documentTexts, selectedModel);
       setHistory(prev => [...prev, { role: 'assistant', content: reply }]);
     } catch (err) {
       toast.error(err.message, 'Message Failed');
@@ -211,6 +217,28 @@ export default function ChatApp() {
     toast.info('Started a new chat', 'New Chat');
   }
 
+  async function handleViewDocument(sessionId, filename) {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_URL}/api/document/file/${sessionId}`, {
+        headers: getAuthHeader(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch document');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      setViewerModal({ show: true, blobUrl, filename });
+    } catch (err) {
+      toast.error(err.message, 'View Failed');
+    }
+  }
+
+  function handleCloseViewer() {
+    if (viewerModal.blobUrl) {
+      URL.revokeObjectURL(viewerModal.blobUrl);
+    }
+    setViewerModal({ show: false, blobUrl: null, filename: '' });
+  }
+
   function handleLogout() {
     toast.success('You have been logged out. See you soon!', 'Goodbye');
     setTimeout(() => {
@@ -222,39 +250,99 @@ export default function ChatApp() {
   return (
     <>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
-      <div className="flex h-screen bg-gray-50 overflow-hidden">
-        <Sidebar
-          document={document}
-          isUploading={isUploading}
-          onFileUpload={handleFileUpload}
-          onRemoveDocument={handleRemoveDocument}
-          onShowHistory={() => setShowHistory(!showHistory)}
-          onNewChat={handleNewChat}
-          user={user}
-          onLogout={handleLogout}
-          documents={documents}
-          selectedDocuments={selectedDocuments}
-          onToggleDocument={handleToggleDocument}
-          onSearch={handleSearchDocuments}
-        />
-        {showHistory ? (
-          <SessionHistory
-            sessions={sessions}
-            onSelectSession={handleLoadSession}
-            onDeleteSession={handleDeleteSession}
-            onClose={() => setShowHistory(false)}
-          />
-        ) : (
-          <ChatArea
+      <div className="flex h-screen bg-gray-50 overflow-hidden flex-col md:flex-row">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block md:w-80 lg:w-96">
+          <Sidebar
+            document={document}
+            sessionId={sessionId}
+            isUploading={isUploading}
+            onFileUpload={handleFileUpload}
+            onRemoveDocument={handleRemoveDocument}
+            onShowHistory={() => setShowHistory(!showHistory)}
+            onNewChat={handleNewChat}
+            user={user}
+            onLogout={handleLogout}
+            documents={documents}
             selectedDocuments={selectedDocuments}
-            history={history}
-            isSending={isSending}
-            error={error}
-            onSendMessage={handleSendMessage}
-            onClearChat={handleClearChat}
+            onToggleDocument={handleToggleDocument}
+            onSearch={handleSearchDocuments}
+            onDownloadDocument={downloadDocument}
+            onViewDocument={handleViewDocument}
           />
+        </div>
+
+        {/* Mobile Sidebar Overlay */}
+        {showMobileSidebar && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden" onClick={() => setShowMobileSidebar(false)} />
         )}
+
+        {/* Mobile Sidebar */}
+        <div className={`fixed left-0 top-0 h-full w-80 bg-white z-40 transform transition-transform duration-300 md:hidden ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
+          <Sidebar
+            document={document}
+            sessionId={sessionId}
+            isUploading={isUploading}
+            onFileUpload={handleFileUpload}
+            onRemoveDocument={handleRemoveDocument}
+            onShowHistory={() => { setShowHistory(!showHistory); setShowMobileSidebar(false); }}
+            onNewChat={handleNewChat}
+            user={user}
+            onLogout={handleLogout}
+            documents={documents}
+            selectedDocuments={selectedDocuments}
+            onToggleDocument={handleToggleDocument}
+            onSearch={handleSearchDocuments}
+            onDownloadDocument={downloadDocument}
+            onViewDocument={handleViewDocument}
+          />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Mobile Header */}
+          <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+            <button
+              onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <h1 className="text-lg font-semibold text-gray-800">Document Chat</h1>
+            <div className="w-6" />
+          </div>
+
+          {/* Chat Content */}
+          {showHistory ? (
+            <SessionHistory
+              sessions={sessions}
+              onSelectSession={handleLoadSession}
+              onDeleteSession={handleDeleteSession}
+              onClose={() => setShowHistory(false)}
+            />
+          ) : (
+            <ChatArea
+              selectedDocuments={selectedDocuments}
+              history={history}
+              isSending={isSending}
+              error={error}
+              onSendMessage={handleSendMessage}
+              onClearChat={handleClearChat}
+              onDownloadDocument={downloadDocument}
+              onToggleMobileSidebar={() => setShowMobileSidebar(!showMobileSidebar)}
+            />
+          )}
+        </div>
       </div>
+      {viewerModal.show && (
+        <ViewerModal
+          blobUrl={viewerModal.blobUrl}
+          filename={viewerModal.filename}
+          onClose={handleCloseViewer}
+        />
+      )}
     </>
   );
 }
