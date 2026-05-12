@@ -301,18 +301,23 @@ export default function ChatApp() {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Mobile Header */}
-          <div className="md:hidden bg-white border-b border-gray-200 px-3 py-3 flex items-center justify-between gap-2">
+          <div className="md:hidden bg-white border-b-2 border-gray-300 px-3 py-3 flex items-center justify-between gap-3 sticky top-0 z-20">
             <button
               onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0"
+              className="p-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex-shrink-0 active:scale-95"
               title="Open menu"
             >
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-sm sm:text-base font-semibold text-gray-800 truncate flex-1">Document Chat</h1>
-            <div className="w-5 flex-shrink-0" />
+            <h1 className="text-sm sm:text-base font-bold text-gray-900 truncate flex-1">Document Chat</h1>
+            <button
+              onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0 active:scale-95"
+            >
+              Menu
+            </button>
           </div>
 
           {/* Chat Content */}
