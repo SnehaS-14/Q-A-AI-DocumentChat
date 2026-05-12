@@ -278,7 +278,7 @@ export default function ChatApp() {
         )}
 
         {/* Mobile Sidebar */}
-        <div className={`fixed left-0 top-0 h-full w-80 bg-white z-40 transform transition-transform duration-300 md:hidden ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`fixed left-0 top-0 h-screen w-80 bg-white z-40 transform transition-transform duration-300 md:hidden overflow-hidden ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
           <Sidebar
             document={document}
             sessionId={sessionId}
