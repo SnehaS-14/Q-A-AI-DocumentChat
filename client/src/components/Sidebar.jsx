@@ -77,18 +77,28 @@ export default function Sidebar({
     const validTypes = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-word.document.macroEnabled.12',
       'application/msword',
     ];
-    const validExts = /\.(pdf|docx|doc)$/i;
-    if (!validTypes.includes(file.type) && !validExts.test(file.name)) {
-      alert('Please upload a PDF, DOCX, or DOC file.');
+    const validExts = /\.(pdf|docx|doc|DOC|DOCX|PDF)$/;
+
+    // Check file extension or MIME type
+    const isValidExtension = validExts.test(file.name);
+    const isValidMimeType = validTypes.includes(file.type);
+
+    if (!isValidExtension && !isValidMimeType) {
+      console.log('File validation failed:', { name: file.name, type: file.type });
+      alert('Please upload a PDF, DOCX, or DOC file. Selected: ' + file.name);
       return;
     }
+
     const maxSize = 100 * 1024 * 1024; // 100MB
     if (file.size > maxSize) {
-      alert('File is too large. Maximum size is 100MB.');
+      alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 100MB.`);
       return;
     }
+
+    console.log('File validation passed, uploading:', file.name);
     onFileUpload(file);
   }
 
@@ -282,7 +292,7 @@ export default function Sidebar({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.docx,.doc"
+          accept=".pdf,.docx,.doc,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           onChange={handleFileInputChange}
           multiple
           className="hidden"
