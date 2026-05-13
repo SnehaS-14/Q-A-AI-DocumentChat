@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import DocumentManager from './DocumentManager';
 import LogoutModal from './LogoutModal';
-import ModelSelector from './ModelSelector';
 
 function formatBytes(bytes) {
   if (!bytes) return '';
@@ -272,9 +271,7 @@ export default function Sidebar({
 
         {/* Footer - Fixed */}
         <div className="border-t border-gray-200 bg-white flex flex-col flex-shrink-0 sticky bottom-0 z-10">
-          <ModelSelector onModelChange={() => {}} />
-
-          <div className="px-2 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-3 border-t border-gray-100 flex flex-col gap-1.5 sm:gap-2">
+          <div className="px-2 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-3 flex flex-col gap-1.5 sm:gap-2">
             <button
               onClick={onShowHistory}
               className="w-full py-1.5 sm:py-2 px-2 sm:px-3 bg-blue-50 text-blue-600 text-xs sm:text-sm font-semibold rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5 sm:gap-2 touch-manipulation"

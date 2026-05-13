@@ -338,6 +338,7 @@ export default function ChatApp() {
                 onClearChat={handleClearChat}
                 onDownloadDocument={downloadDocument}
                 onToggleMobileSidebar={() => setShowMobileSidebar(!showMobileSidebar)}
+                onModelChange={(model) => setSelectedModel(model)}
               />
             )}
           </div>

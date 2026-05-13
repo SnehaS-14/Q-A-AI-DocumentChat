@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
+import ModelSelector from './ModelSelector';
 
 const SUGGESTION_CHIPS = [
   "What is this document about?",
@@ -8,7 +9,7 @@ const SUGGESTION_CHIPS = [
   "What are the main conclusions?",
 ];
 
-export default function ChatArea({ selectedDocuments = [], history, isSending, error, onSendMessage, onClearChat, onDownloadDocument, onToggleMobileSidebar }) {
+export default function ChatArea({ selectedDocuments = [], history, isSending, error, onSendMessage, onClearChat, onDownloadDocument, onToggleMobileSidebar, onModelChange }) {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -81,14 +82,19 @@ export default function ChatArea({ selectedDocuments = [], history, isSending, e
             </div>
           )}
         </div>
-        {history.length > 0 && (
-          <button
-            onClick={onClearChat}
-            className="text-sm text-gray-500 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 flex-shrink-0"
-          >
-            Clear chat
-          </button>
-        )}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {history.length > 0 && (
+            <button
+              onClick={onClearChat}
+              className="text-sm text-gray-500 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50"
+            >
+              Clear chat
+            </button>
+          )}
+          <div className="w-40">
+            <ModelSelector onModelChange={onModelChange} />
+          </div>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex flex-col gap-3 sm:gap-4 min-h-0">
