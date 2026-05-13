@@ -269,7 +269,6 @@ export default function Sidebar({
               />
             )}
           </div>
-        </div>
 
         {/* Footer - Fixed */}
         <div className="border-t border-gray-200 bg-white flex flex-col flex-shrink-0 sticky bottom-0 z-10">
