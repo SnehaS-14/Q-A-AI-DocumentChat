@@ -274,11 +274,11 @@ export default function ChatApp() {
 
         {/* Mobile Sidebar Overlay */}
         {showMobileSidebar && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden" onClick={() => setShowMobileSidebar(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden cursor-pointer" onClick={() => setShowMobileSidebar(false)} />
         )}
 
         {/* Mobile Sidebar */}
-        <div className={`fixed left-0 top-0 h-screen w-72 sm:w-80 bg-white z-40 transform transition-transform duration-300 md:hidden overflow-hidden ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`fixed left-0 top-0 h-screen w-64 sm:w-72 bg-white z-40 transform transition-transform duration-300 md:hidden overflow-hidden shadow-2xl ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
           <Sidebar
             document={document}
             sessionId={sessionId}
@@ -301,23 +301,22 @@ export default function ChatApp() {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
           {/* Mobile Header */}
-          <div className="md:hidden bg-white border-b-2 border-gray-300 px-3 py-3 flex items-center justify-between gap-3 sticky top-0 z-20">
+          <div className="md:hidden bg-gradient-to-r from-blue-600 to-blue-700 border-b border-blue-800 px-2 sm:px-3 py-2.5 flex items-center justify-between gap-2 sm:gap-3 sticky top-0 z-20 shadow-md">
             <button
               onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-              className="p-2.5 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex-shrink-0 active:scale-95"
-              title="Open menu"
+              className={`p-2 rounded-lg transition-all flex-shrink-0 active:scale-95 touch-manipulation ${
+                showMobileSidebar
+                  ? 'bg-white text-blue-600'
+                  : 'bg-blue-500 hover:bg-blue-500 text-white'
+              }`}
+              title={showMobileSidebar ? 'Close menu' : 'Open menu'}
             >
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+              <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-sm sm:text-base font-bold text-gray-900 truncate flex-1">Document Chat</h1>
-            <button
-              onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0 active:scale-95"
-            >
-              Menu
-            </button>
+            <h1 className="text-xs sm:text-sm font-bold text-white truncate flex-1">📚 Document Q&A</h1>
+            <div className="w-5 sm:w-6 flex-shrink-0" />
           </div>
 
           {/* Chat Content */}

@@ -117,13 +117,13 @@ export default function Sidebar({
         />
       )}
 
-      <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+      <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden h-full">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-xl">📚</span>
-            <span className="font-bold text-gray-800 text-base">Document Q&A</span>
+            <span className="text-lg sm:text-xl">📚</span>
+            <span className="font-bold text-gray-800 text-sm sm:text-base truncate">Document Q&A</span>
           </div>
 
           {user && (
@@ -144,11 +144,11 @@ export default function Sidebar({
 
         {/* User info */}
         {user && (
-          <div className="flex items-center gap-3 mx-4 my-3 px-3 py-2.5 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+          <div className="flex items-center gap-2 sm:gap-3 mx-2 sm:mx-4 my-2 sm:my-3 px-2 sm:px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100 flex-shrink-0">
             <UserAvatar username={user.username} />
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-400 leading-none mb-0.5">Logged in as</p>
-              <p className="text-sm font-semibold text-blue-700 truncate">{user.username}</p>
+              <p className="text-xs sm:text-sm font-semibold text-blue-700 truncate">{user.username}</p>
             </div>
           </div>
         )}
@@ -269,21 +269,22 @@ export default function Sidebar({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-100 bg-white overflow-y-auto">
+        <div className="border-t border-gray-100 bg-white flex flex-col flex-shrink-0">
           <ModelSelector onModelChange={() => {}} />
 
-          <div className="px-4 pb-4 pt-3 border-t border-gray-100 flex flex-col gap-2">
+          <div className="px-2 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-3 border-t border-gray-100 flex flex-col gap-1.5 sm:gap-2">
             <button
               onClick={onShowHistory}
-              className="w-full py-2 px-3 bg-blue-50 text-blue-600 text-sm font-semibold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-1.5 sm:py-2 px-2 sm:px-3 bg-blue-50 text-blue-600 text-xs sm:text-sm font-semibold rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-1.5 sm:gap-2 touch-manipulation"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 sm:w-4 h-3.5 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              View Chat History
+              <span className="hidden sm:inline">View Chat</span>
+              <span className="sm:hidden">History</span>
             </button>
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-gray-400 text-center leading-tight">
               PDF, DOCX, DOC · Max 100 MB
             </p>
           </div>
