@@ -91,9 +91,7 @@ export default function ChatArea({ selectedDocuments = [], history, isSending, e
               Clear chat
             </button>
           )}
-          <div className="w-40">
-            <ModelSelector onModelChange={onModelChange} />
-          </div>
+          <ModelSelector onModelChange={onModelChange} compact={true} />
         </div>
       </header>
 

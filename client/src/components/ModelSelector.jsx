@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAvailableModels, getSelectedModel, setSelectedModel } from '../api';
 
-export default function ModelSelector({ onModelChange }) {
+export default function ModelSelector({ onModelChange, compact = false }) {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelected] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -50,6 +50,55 @@ export default function ModelSelector({ onModelChange }) {
   if (error) {
     return (
       <div className="text-xs text-red-500 text-center py-2">{error}</div>
+    );
+  }
+
+  if (compact) {
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center justify-between px-2 sm:px-3 py-1.5 bg-white border border-gray-300 rounded-lg hover:border-blue-400 transition-colors text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap"
+          title={selectedModelData?.name || 'Select model'}
+        >
+          <span className="truncate max-w-[120px]">
+            {selectedModelData?.name?.split(':')[1]?.trim().split('(')[0] || 'Model'}
+          </span>
+          <svg className={`w-3 h-3 ml-1 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto min-w-max">
+            {availableModels.length > 0 ? (
+              availableModels.map(model => (
+                <button
+                  key={model.id}
+                  onClick={() => handleSelectModel(model.id)}
+                  className={`w-full text-left px-3 py-2.5 text-sm border-b border-gray-100 last:border-b-0 transition-colors hover:bg-blue-50 ${
+                    selectedModel === model.id ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{model.name}</span>
+                    {selectedModel === model.id && (
+                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">{model.provider}</p>
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-4 text-center text-sm text-gray-500">
+                No models available. Configure OpenRouter API key.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     );
   }
 

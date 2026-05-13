@@ -51,7 +51,7 @@ const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 // Available models with their IDs
 const AVAILABLE_MODELS = {
   'groq-llama-3.1-8b': { name: 'Groq: Llama 3.1 8B (Fast)', provider: 'groq', id: 'llama-3.1-8b-instant' },
-  'groq-mixtral-8x7b': { name: 'Groq: Mixtral 8x7B (Powerful)', provider: 'groq', id: 'mixtral-8x7b-32768' },
+  'groq-llama-3.2-11b': { name: 'Groq: Llama 3.2 11B (Balanced)', provider: 'groq', id: 'llama-3.2-11b-vision-preview' },
   'openrouter-claude-3.5-sonnet': { name: 'OpenRouter: Claude 3.5 Sonnet', provider: 'openrouter', id: 'anthropic/claude-3.5-sonnet' },
   'openrouter-gpt-4-turbo': { name: 'OpenRouter: GPT-4 Turbo', provider: 'openrouter', id: 'openai/gpt-4-turbo' },
   'openrouter-llama-3.1-405b': { name: 'OpenRouter: Llama 3.1 405B', provider: 'openrouter', id: 'meta-llama/llama-3.1-405b-instruct' },
