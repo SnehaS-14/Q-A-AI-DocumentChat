@@ -341,24 +341,33 @@ export async function getDocumentBySessionId(sessionId) {
 }
 
 export async function downloadDocument(sessionId, view = false) {
-  const res = await fetch(`${API_URL}/api/document/file/${sessionId}`, {
-    headers: getAuthHeader(),
-  });
+  try {
+    const query = view ? '' : '?download=true';
+    const res = await fetch(`${API_URL}/api/document/file/${sessionId}${query}`, {
+      headers: getAuthHeader(),
+    });
 
-  if (!res.ok) throw new Error('Failed to fetch document');
+    if (!res.ok) throw new Error('Failed to fetch document');
 
-  const blob = await res.blob();
-  const disposition = res.headers.get('content-disposition') || '';
-  const filename = disposition.match(/filename="(.+)"/)?.[1] || 'document';
-  const url = URL.createObjectURL(blob);
+    const blob = await res.blob();
+    const disposition = res.headers.get('content-disposition') || '';
+    const filename = disposition.match(/filename[^;=\n]*=(?:(["\']).*?\1|[^;\n]*)/)?.[0]?.split('=')[1]?.replace(/['"]/g, '') || 'document';
 
-  if (view) {
-    window.open(url, '_blank');
-  } else {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
+    if (view) {
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 15000);
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  } catch (err) {
+    throw new Error(err.message || 'Failed to download document');
   }
-  setTimeout(() => URL.revokeObjectURL(url), 15000);
 }

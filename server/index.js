@@ -561,13 +561,10 @@ app.get('/api/document/file/:sessionId', authenticateToken, async (req, res) => 
     if (!fs.existsSync(doc.filePath)) {
       return res.status(404).json({ error: 'File not found on disk' });
     }
-    const download = req.query.download === 'true';
-    if (download) {
-      res.download(doc.filePath, doc.filename);
-    } else {
-      res.setHeader('Content-Disposition', `inline; filename="${doc.filename}"`);
-      res.sendFile(doc.filePath);
-    }
+    const isDownload = req.query.download === 'true';
+    res.setHeader('Content-Disposition', `${isDownload ? 'attachment' : 'inline'}; filename="${doc.filename}"`);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.sendFile(doc.filePath);
   } catch (err) {
     console.error('Download file error:', err);
     res.status(500).json({ error: err.message });
