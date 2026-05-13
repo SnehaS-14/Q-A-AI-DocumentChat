@@ -12,7 +12,7 @@ export default function DocumentManager({ documents, selectedDocuments, onToggle
   }
 
   return (
-    <div className="p-2 sm:p-4 border-t border-gray-200 bg-gray-50 max-h-64 overflow-y-auto">
+    <div className="p-2 sm:p-4 border-t border-gray-200 bg-gray-50  overflow-y-auto">
       <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Documents in Chat</h3>
 
       {/* Search Box */}
