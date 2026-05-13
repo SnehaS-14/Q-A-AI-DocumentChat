@@ -12,27 +12,27 @@ export default function DocumentManager({ documents, selectedDocuments, onToggle
   }
 
   return (
-    <div className="p-4 border-t border-gray-200 bg-gray-50 max-h-64 overflow-y-auto">
-      <h3 className="text-sm font-semibold text-gray-700 mb-3">Documents in Chat</h3>
+    <div className="p-2 sm:p-4 border-t border-gray-200 bg-gray-50 max-h-64 overflow-y-auto">
+      <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Documents in Chat</h3>
 
       {/* Search Box */}
       <input
         type="text"
-        placeholder="Search documents..."
+        placeholder="Search..."
         value={searchQuery}
         onChange={handleSearch}
-        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+        className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg mb-2 sm:mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
       />
 
       {/* Selected Documents */}
       {selectedDocuments.length > 0 && (
-        <div className="mb-4">
-          <p className="text-xs text-gray-600 font-medium mb-2">Selected ({selectedDocuments.length})</p>
-          <div className="space-y-2">
+        <div className="mb-2 sm:mb-4">
+          <p className="text-xs text-gray-600 font-medium mb-1.5 sm:mb-2">Selected ({selectedDocuments.length})</p>
+          <div className="space-y-1.5 sm:space-y-2">
             {selectedDocuments.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center justify-between bg-white p-2 rounded border border-green-200 bg-green-50"
+                className="flex items-center justify-between bg-white p-1.5 sm:p-2 rounded border border-green-200 bg-green-50"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-gray-800 truncate">{doc.filename}</p>
@@ -40,7 +40,7 @@ export default function DocumentManager({ documents, selectedDocuments, onToggle
                 </div>
                 <button
                   onClick={() => onToggleDocument(doc.id, false)}
-                  className="text-xs text-red-500 hover:text-red-700 ml-2 flex-shrink-0"
+                  className="text-xs text-red-500 hover:text-red-700 ml-1 sm:ml-2 flex-shrink-0 font-bold"
                 >
                   ✕
                 </button>

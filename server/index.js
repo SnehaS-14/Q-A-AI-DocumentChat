@@ -331,8 +331,8 @@ app.get('/api/search', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Search query too short' });
     }
     const results = await Document.find(
-      { userId: req.user.id, text: { $regex: q, $options: 'i' } },
-      { filename: 1, charCount: 1, uploadedAt: 1 }
+      { userId: req.user.id, filename: { $regex: q, $options: 'i' } },
+      { filename: 1, charCount: 1, uploadedAt: 1, sessionId: 1, filePath: 1 }
     ).limit(10);
     res.json({ results });
   } catch (err) {
