@@ -154,44 +154,45 @@ export default function Sidebar({
         )}
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col gap-3 min-h-0">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-2 sm:gap-3 min-h-0 scroll-smooth">
+          {/* Scrollable wrapper for all content */}
+          <div className="flex flex-col gap-2 sm:gap-3">
+            {/* Drop zone */}
+            {!document && !isUploading && (
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`
+                  border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2
+                  cursor-pointer transition-all duration-200 text-center min-h-[150px]
+                  ${isDragging
+                    ? 'border-blue-500 bg-blue-50 text-blue-600 scale-[1.02]'
+                    : 'border-gray-300 bg-gray-50 text-gray-400 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500'
+                  }
+                `}
+              >
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <p className="text-sm font-medium">Drop your document here</p>
+                <p className="text-xs opacity-70">or click to browse</p>
+              </div>
+            )}
 
-          {/* Drop zone */}
-          {!document && !isUploading && (
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`
-                border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2
-                cursor-pointer transition-all duration-200 text-center min-h-[150px]
-                ${isDragging
-                  ? 'border-blue-500 bg-blue-50 text-blue-600 scale-[1.02]'
-                  : 'border-gray-300 bg-gray-50 text-gray-400 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500'
-                }
-              `}
-            >
-              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              <p className="text-sm font-medium">Drop your document here</p>
-              <p className="text-xs opacity-70">or click to browse</p>
-            </div>
-          )}
+            {/* Uploading spinner */}
+            {isUploading && (
+              <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 flex flex-col items-center justify-center gap-3 min-h-[150px] bg-blue-50">
+                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-blue-600 font-medium">Parsing document...</p>
+              </div>
+            )}
 
-          {/* Uploading spinner */}
-          {isUploading && (
-            <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 flex flex-col items-center justify-center gap-3 min-h-[150px] bg-blue-50">
-              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-blue-600 font-medium">Parsing document...</p>
-            </div>
-          )}
-
-          {/* Document card */}
-          {document && !isUploading && (
-            <div className="border border-green-200 bg-green-50 rounded-xl p-4 flex flex-col gap-2">
+            {/* Document card */}
+            {document && !isUploading && (
+              <div className="border border-green-200 bg-green-50 rounded-xl p-4 flex flex-col gap-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-800 truncate">{document.filename}</p>
@@ -254,18 +255,19 @@ export default function Sidebar({
                   </button>
                 </div>
               )}
-            </div>
-          )}
+              </div>
+            )}
 
-          {/* Document Manager */}
-          {document && !isUploading && documents.length > 0 && (
-            <DocumentManager
-              documents={documents}
-              selectedDocuments={selectedDocuments}
-              onToggleDocument={onToggleDocument}
-              onSearch={onSearch}
-            />
-          )}
+            {/* Document Manager */}
+            {document && !isUploading && documents.length > 0 && (
+              <DocumentManager
+                documents={documents}
+                selectedDocuments={selectedDocuments}
+                onToggleDocument={onToggleDocument}
+                onSearch={onSearch}
+              />
+            )}
+          </div>
         </div>
 
         {/* Footer */}
