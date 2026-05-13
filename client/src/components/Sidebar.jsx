@@ -117,7 +117,7 @@ export default function Sidebar({
         />
       )}
 
-      <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden h-full">
+      <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden h-screen md:h-full">
 
         {/* Header - Fixed */}
         <div className="border-b border-gray-200 flex-shrink-0 bg-white sticky top-0 z-10">

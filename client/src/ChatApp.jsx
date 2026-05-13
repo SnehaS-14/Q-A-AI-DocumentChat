@@ -252,7 +252,7 @@ export default function ChatApp() {
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       <div className="flex h-screen bg-gray-50 overflow-hidden flex-col md:flex-row">
         {/* Desktop Sidebar */}
-        <div className="hidden md:block md:w-80 lg:w-96">
+        <div className="hidden md:block md:w-80 lg:w-96 h-full overflow-hidden">
           <Sidebar
             document={document}
             sessionId={sessionId}
