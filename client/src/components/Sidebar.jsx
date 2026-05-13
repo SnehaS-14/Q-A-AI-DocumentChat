@@ -157,8 +157,7 @@ export default function Sidebar({
         </div>
 
         {/* Scrollable Body - Single Unified Scroll */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 scroll-smooth">
-          <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 scroll-smooth flex flex-col gap-3 sm:gap-4 min-h-0">
             {/* Drop zone */}
             {!document && !isUploading && (
               <div
