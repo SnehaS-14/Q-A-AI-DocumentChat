@@ -299,9 +299,9 @@ export default function ChatApp() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-          {/* Mobile Header */}
-          <div className="md:hidden bg-gradient-to-r from-blue-600 to-blue-700 border-b border-blue-800 px-2 sm:px-3 py-2.5 flex items-center justify-between gap-2 sm:gap-3 sticky top-0 z-20 shadow-md">
+        <div className="flex-1 flex flex-col min-w-0 h-full">
+          {/* Mobile Header - Fixed */}
+          <div className="md:hidden bg-gradient-to-r from-blue-600 to-blue-700 border-b border-blue-800 px-2 sm:px-3 py-2.5 flex items-center justify-between gap-2 sm:gap-3 sticky top-0 z-50 shadow-md flex-shrink-0">
             <button
               onClick={() => setShowMobileSidebar(!showMobileSidebar)}
               className={`p-2 rounded-lg transition-all flex-shrink-0 active:scale-95 touch-manipulation ${
@@ -319,26 +319,28 @@ export default function ChatApp() {
             <div className="w-5 sm:w-6 flex-shrink-0" />
           </div>
 
-          {/* Chat Content */}
-          {showHistory ? (
-            <SessionHistory
-              sessions={sessions}
-              onSelectSession={handleLoadSession}
-              onDeleteSession={handleDeleteSession}
-              onClose={() => setShowHistory(false)}
-            />
-          ) : (
-            <ChatArea
-              selectedDocuments={selectedDocuments}
-              history={history}
-              isSending={isSending}
-              error={error}
-              onSendMessage={handleSendMessage}
-              onClearChat={handleClearChat}
-              onDownloadDocument={downloadDocument}
-              onToggleMobileSidebar={() => setShowMobileSidebar(!showMobileSidebar)}
-            />
-          )}
+          {/* Chat Content - Scrollable Body */}
+          <div className="flex-1 overflow-hidden">
+            {showHistory ? (
+              <SessionHistory
+                sessions={sessions}
+                onSelectSession={handleLoadSession}
+                onDeleteSession={handleDeleteSession}
+                onClose={() => setShowHistory(false)}
+              />
+            ) : (
+              <ChatArea
+                selectedDocuments={selectedDocuments}
+                history={history}
+                isSending={isSending}
+                error={error}
+                onSendMessage={handleSendMessage}
+                onClearChat={handleClearChat}
+                onDownloadDocument={downloadDocument}
+                onToggleMobileSidebar={() => setShowMobileSidebar(!showMobileSidebar)}
+              />
+            )}
+          </div>
         </div>
       </div>
       {viewerModal.show && (

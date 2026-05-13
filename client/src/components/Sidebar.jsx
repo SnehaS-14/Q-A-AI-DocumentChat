@@ -119,44 +119,46 @@ export default function Sidebar({
 
       <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden h-full">
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100 flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="text-lg sm:text-xl">📚</span>
-            <span className="font-bold text-gray-800 text-sm sm:text-base truncate">Document Q&A</span>
+        {/* Header - Fixed */}
+        <div className="border-b border-gray-200 flex-shrink-0 bg-white sticky top-0 z-10">
+          {/* Title Bar */}
+          <div className="flex items-center justify-between px-3 sm:px-4 py-3 sm:py-4 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <span className="text-lg sm:text-xl">📚</span>
+              <span className="font-bold text-gray-800 text-sm sm:text-base truncate">Document Q&A</span>
+            </div>
+
+            {user && (
+              <button
+                onClick={() => setShowLogoutModal(true)}
+                title="Sign out"
+                className="group flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg text-gray-400
+                           hover:text-red-500 hover:bg-red-50 transition-all duration-150"
+              >
+                <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span className="text-xs font-medium hidden sm:inline">Sign out</span>
+              </button>
+            )}
           </div>
 
+          {/* User info - Fixed in header */}
           {user && (
-            <button
-              onClick={() => setShowLogoutModal(true)}
-              title="Sign out"
-              className="group flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-gray-400
-                         hover:text-red-500 hover:bg-red-50 transition-all duration-150"
-            >
-              <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span className="text-xs font-medium">Sign out</span>
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3 mx-2 sm:mx-4 my-2 sm:my-3 px-2 sm:px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+              <UserAvatar username={user.username} />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-gray-400 leading-none mb-0.5">Logged in as</p>
+                <p className="text-xs sm:text-sm font-semibold text-blue-700 truncate">{user.username}</p>
+              </div>
+            </div>
           )}
         </div>
 
-        {/* User info */}
-        {user && (
-          <div className="flex items-center gap-2 sm:gap-3 mx-2 sm:mx-4 my-2 sm:my-3 px-2 sm:px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100 flex-shrink-0">
-            <UserAvatar username={user.username} />
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-gray-400 leading-none mb-0.5">Logged in as</p>
-              <p className="text-xs sm:text-sm font-semibold text-blue-700 truncate">{user.username}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-2 sm:gap-3 min-h-0 scroll-smooth">
-          {/* Scrollable wrapper for all content */}
-          <div className="flex flex-col gap-2 sm:gap-3">
+        {/* Scrollable Body - Single Unified Scroll */}
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-2 sm:py-3 scroll-smooth">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {/* Drop zone */}
             {!document && !isUploading && (
               <div
@@ -166,7 +168,7 @@ export default function Sidebar({
                 onClick={() => fileInputRef.current?.click()}
                 className={`
                   border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-2
-                  cursor-pointer transition-all duration-200 text-center min-h-[150px]
+                  cursor-pointer transition-all duration-200 text-center min-h-[140px]
                   ${isDragging
                     ? 'border-blue-500 bg-blue-50 text-blue-600 scale-[1.02]'
                     : 'border-gray-300 bg-gray-50 text-gray-400 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-500'
@@ -270,8 +272,8 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-gray-100 bg-white flex flex-col flex-shrink-0">
+        {/* Footer - Fixed */}
+        <div className="border-t border-gray-200 bg-white flex flex-col flex-shrink-0 sticky bottom-0 z-10">
           <ModelSelector onModelChange={() => {}} />
 
           <div className="px-2 sm:px-4 pb-3 sm:pb-4 pt-2 sm:pt-3 border-t border-gray-100 flex flex-col gap-1.5 sm:gap-2">
